@@ -4,50 +4,41 @@ import com.thealpinegoat.fellermod.FellerMod;
 import net.minecraft.src.*;
 
 public class FellerLogBlock extends BlockLog {
-    public FellerLogBlock(int i, String name, int[] atlasIndices, float hardness, StepSound stepSound, boolean setMossGrowable) {
+    public FellerLogBlock(Integer i) {
         super(i);
-        this.setBlockName(name);
-        this.atlasIndices = atlasIndices;
-        this.setHardness(hardness);
-        this.setStepSound(stepSound);
-        if (setMossGrowable) {
-            this.setMossGrowable();
-        }
+        this.setHardness(2.0F);
     }
 
     private boolean isPartOfTree(World world, int x, int y, int z) {
         return isPartOfTree(world, x, y, z, 1);
     }
 
-    private boolean isPartOfTree(World world, int x, int y, int z, int i) {
-        if (i > FellerMod.maxTreeHeight) {
+    private boolean isPartOfTree(World world, int x, int y, int z, int n) {
+        if (n > FellerMod.maxTreeHeight) {
             return false;
         }
         int blockId = world.getBlockId(x, y + 1, z);
         if (Block.blocksList[blockId] instanceof BlockLeavesBase) {
             int leafCount = 0;
             int r = 2;
-            for (int m = -r; m <= r; m++) {
-                for (int n = -r; n <= r; n++) {
-                    for (int o = -r; o <= r; o++) {
-                        if ((m | n | o) == 0) {
+            for (int i = -r; i <= r; i++) {
+                for (int j = -r; j <= r; j++) {
+                    for (int k = -r; k <= r; k++) {
+                        if ((i | j | k) == 0) {
                             continue;
                         }
-                        blockId = world.getBlockId(x + m, y + n, z + o);
+                        blockId = world.getBlockId(x + i, y + j, z + k);
                         if (Block.blocksList[blockId] instanceof BlockLeavesBase) {
                             leafCount += 1;
                         }
                     }
                 }
             }
-            Block block = Block.blocksList[world.getBlockId(x, y, z)];
-            if (block != null && leafCount >= FellerMod.idToLeafNumberMap.get(block)) {
-                return true;
-            }
-            return false;
+            blockId = world.getBlockId(x, y, z);
+            return FellerMod.idToLeafNumberMap.containsKey(blockId) && leafCount >= FellerMod.idToLeafNumberMap.get(blockId);
         }
         if (Block.blocksList[blockId] instanceof BlockLog) {
-            return isPartOfTree(world, x, y + 1, z, i + 1);
+            return isPartOfTree(world, x, y + 1, z, n + 1);
         }
         return false;
     }
